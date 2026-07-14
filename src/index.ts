@@ -34,32 +34,29 @@ app.post("/api/order", async (c) => {
     try {
         const order = await c.req.json();
 
-        if (!order.userId) {
-            return c.json({ success: false, error: "Missing userId" }, 400);
-        }
+        if (!order.userId) return c.json({ success: false }, 400);
 
-        // Переводим элементы на HTML-теги <b>
         const itemsList = order.items
-            .map((item: any) => `• <b>${item.name}</b> x${item.qty}`)
+            .map((item: any) => `▪️ ${item.name} <b>x${item.qty}</b>`)
             .join("\n");
 
-        // Используем красивый юникод-символ «─» вместо ломающих разметку дефисов или подчеркиваний
-        const divider = "───────────────────────────────";
-
-        const checkMessage = [
+        const divider = "━━━━━━━━━━━━━━━━━━";
+        const finalCheck = [
             `🧾 <b>ДЕМО-ЧЕК АВТОМАТИЗАЦИИ</b>`,
             divider,
             `👤 <b>Клиент:</b> @${order.customer}`,
+            ``,
             `📦 <b>Состав заказа:</b>`,
+            ``,
             itemsList,
             divider,
-            `💵 <b>Итого к оплате:</b> ${order.total} ₽`,
-            `\n⚡ <i>Заказ успешно оформлен через API Mini App!</i>`,
+            `💵 <b>Итого к оплате:</b> <b>${order.total} ₽</b>`,
+            ``,
+            `<blockquote>✅ <b>Готово!</b> Ваш заказ успешно оформлен.\n\n❗ Это лишь демонстрация автоматизации. В реальных кейсах мы можем реализовать абсолютно любую логику и функционал.</blockquote>`
         ].join("\n");
 
-        // Меняем parse_mode на HTML
-        await bot.api.sendMessage(order.userId, checkMessage, {
-            parse_mode: "HTML",
+        await bot.api.sendMessage(order.userId, finalCheck, {
+            parse_mode: "HTML"
         });
 
         return c.json({ success: true });
